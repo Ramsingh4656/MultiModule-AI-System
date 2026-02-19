@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🚀 AI Productivity Suite
+# 🚀 MultiModule AI System
 ### Multi-Module AI Automation Platform
 
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
@@ -145,8 +145,7 @@ graph TB
 
 #### 1️⃣ Clone Repository
 ```bash
-git clone <repository-url>
-cd AI-Productivity-Suite
+git clone https://github.com/Ramsingh4656/MultiModule-AI-System.git
 ```
 
 #### 2️⃣ Backend Setup
@@ -309,45 +308,6 @@ AI-Productivity-Suite/
 
 ---
 
-## 🔧 Troubleshooting
-
-### Common Issues
-
-#### Port Conflicts
-```bash
-# Check if ports are in use
-netstat -an | findstr :8000
-netstat -an | findstr :5173
-
-# Kill processes if needed
-taskkill /f /im python.exe
-taskkill /f /im node.exe
-```
-
-#### Model Loading Issues
-- **First Run**: AI models download automatically (~500MB)
-- **Slow Loading**: Normal on first startup (10-15 seconds)
-- **Memory Issues**: Ensure 4GB+ RAM available
-
-#### Dependency Problems
-```bash
-# Backend dependencies
-cd backend
-pip install --upgrade pip
-pip install -r requirements.txt
-
-# Frontend dependencies
-cd frontend
-npm install --force
-```
-
-#### Windows-Specific
-- Use `startup.bat` for easiest setup
-- Ensure Python and Node.js are in PATH
-- Run as Administrator if permission issues occur
-
----
-
 ## 🚀 Deployment & Scaling
 
 ### Local Development
@@ -376,47 +336,6 @@ npm install --force
 
 ---
 
-## 🤝 Contributing
-
-This is an academic/demo project, but contributions are welcome:
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
-
----
-
-## 📄 License
-
-```
-MIT License
-
-Copyright (c) 2024 AI Productivity Suite
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-```
-
----
-
-<div align="center">
-
 ### 🌟 Star this repository if you found it helpful!
-
-**Built with ❤️ for learning and demonstration purposes**
-
-[⬆ Back to Top](#-ai-productivity-suite)
 
 </div>
