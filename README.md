@@ -310,17 +310,37 @@ AI-Productivity-Suite/
 
 ## 🚀 Deployment & Scaling
 
+### ☁️ Vercel Deployment (Production Ready)
+
+This project is fully configured for Vercel deployment with both frontend and backend running on Vercel's serverless infrastructure.
+
+#### Quick Deploy to Vercel
+1. Push your code to GitHub
+2. Go to [vercel.com](https://vercel.com) and import your repository
+3. Configure:
+   - **Framework Preset**: Vite
+   - **Root Directory**: Leave empty
+4. Click Deploy
+
+**Live URLs after deployment:**
+- Frontend: `https://your-project.vercel.app`
+- API: `https://your-project.vercel.app/api`
+- API Docs: `https://your-project.vercel.app/api/docs`
+
+📖 **Detailed deployment guide**: See [DEPLOYMENT.md](DEPLOYMENT.md)
+
 ### Local Development
 - SQLite database (included)
 - File-based storage
 - Single-machine deployment
 
 ### Production Considerations
-- **Database**: Migrate to PostgreSQL
-- **Storage**: Cloud storage (AWS S3, Azure Blob)
+- **Serverless**: Vercel Functions (FastAPI + Mangum)
+- **Database**: Vercel Postgres or external PostgreSQL
+- **Storage**: Vercel Blob Storage or AWS S3
 - **Caching**: Redis for model caching
-- **Load Balancing**: Multiple backend instances
-- **Containerization**: Docker support ready
+- **CDN**: Automatic via Vercel Edge Network
+- **HTTPS**: Automatic SSL certificates
 
 ---
 

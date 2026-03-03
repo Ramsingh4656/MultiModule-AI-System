@@ -1,0 +1,9 @@
+# Ignore test files
+test_*.py
+*_test.py
+tests/
+
+# Ignore development files
+*.pyc
+__pycache__/
+.pytest_cache/
