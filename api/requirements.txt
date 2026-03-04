@@ -12,8 +12,8 @@ passlib[bcrypt]==1.7.4
 bcrypt==4.1.1
 
 # AI/ML Libraries (Optimized for serverless)
-transformers==4.35.2
-torch==2.1.1
+# torch and transformers are excluded: they exceed Vercel's 250 MB Lambda limit.
+# The chatbot falls back to rule-based responses when they are unavailable.
 scikit-learn==1.3.2
 nltk==3.8.1
 

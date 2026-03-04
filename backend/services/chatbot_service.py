@@ -1,10 +1,17 @@
-import torch
 import re
 import random
 from typing import Dict, List, Tuple
-from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 from config import settings
 import nltk
+
+# torch and transformers exceed Vercel's Lambda size limit and are optional.
+# When unavailable the service falls back to rule-based responses.
+try:
+    import torch
+    from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+    _TORCH_AVAILABLE = True
+except ImportError:
+    _TORCH_AVAILABLE = False
 
 try:
     nltk.data.find('tokenizers/punkt')
@@ -32,6 +39,15 @@ class ChatbotService:
         """Initialize the chatbot with GPT-2 model"""
         self.model_name = settings.CHATBOT_MODEL
         self.max_length = settings.MAX_RESPONSE_LENGTH
+        self.model = None
+        self.tokenizer = None
+        self.generator = None
+
+        if not _TORCH_AVAILABLE:
+            print("torch/transformers not available; using rule-based fallback responses.")
+            self.device = "cpu"
+            return
+
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         
         print(f"Loading chatbot model: {self.model_name} on {self.device}...")
