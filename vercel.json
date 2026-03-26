@@ -1,38 +1,25 @@
+Copied!
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "api/index.py",
-      "use": "@vercel/python"
-    },
-    {
-      "src": "frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
-    }
+  "buildCommand": "cd frontend && npm install && npm run build",
+  "outputDirectory": "frontend/dist",
+  "installCommand": "pip install -r api/requirements.txt",
+  "framework": null,
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index.py" },
+    
+{ "source": "/((?!api).*)", "destination": "/index.html" }
+
   ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "api/index.py"
-    },
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ],
-  "env": {
-    "PYTHONPATH": "/var/task/backend"
-  },
   "functions": {
     "api/index.py": {
+      
+"runtime": "python3.12",
+
       "memory": 1024,
       "maxDuration": 30
     }
+  },
+  "env": {
+    "PYTHONPATH": "/var/task/backend"
   }
 }

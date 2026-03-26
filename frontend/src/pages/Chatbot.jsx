@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { chatAPI } from '../services/api';
 import { Send, Loader2, Bot, User, Sparkles } from 'lucide-react';
+import ErrorAlert from '../components/ErrorAlert';
 
 const Chatbot = () => {
   const [messages, setMessages] = useState([]);
@@ -9,6 +10,7 @@ const Chatbot = () => {
   const [sessionId, setSessionId] = useState(null);
   const [modelInfo, setModelInfo] = useState(null);
   const messagesEndRef = useRef(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     loadModelInfo();
@@ -27,13 +29,18 @@ const Chatbot = () => {
       const response = await chatAPI.getModelInfo();
       setModelInfo(response.data.model_info);
     } catch (error) {
-      console.error('Error loading model info:', error);
+      const msg =
+        error?.response?.data?.detail ||
+        error?.response?.data?.error ||
+        'Unable to reach the backend. Please start the server and try again.';
+      setError(msg);
     }
   };
 
   const handleSend = async () => {
     if (!input.trim() || loading) return;
 
+    setError(null);
     const userMessage = {
       role: 'user',
       content: input,
@@ -67,7 +74,11 @@ const Chatbot = () => {
 
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
-      console.error('Error sending message:', error);
+      const msg =
+        error?.response?.data?.detail ||
+        error?.response?.data?.error ||
+        'Unable to reach the backend. Please start the server and try again.';
+      setError(msg);
       const errorMessage = {
         role: 'assistant',
         content: 'Sorry, I encountered an error. Please try again.',
@@ -96,6 +107,7 @@ const Chatbot = () => {
     <div className="h-full flex flex-col">
       {/* Header */}
       <div className="bg-slate-800 rounded-lg p-4 mb-4">
+        {error && <ErrorAlert title="Chatbot unavailable" message={error} />}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-purple-600 rounded-lg flex items-center justify-center">

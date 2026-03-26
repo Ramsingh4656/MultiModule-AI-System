@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { summaryAPI } from '../services/api';
 import { FileEdit, Loader2 } from 'lucide-react';
+import ErrorAlert from '../components/ErrorAlert';
 
 const Summary = () => {
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
 
   const handleSummarize = async () => {
     if (!text.trim() || text.length < 100) {
@@ -14,12 +16,16 @@ const Summary = () => {
     }
 
     setLoading(true);
+    setError(null);
     try {
       const response = await summaryAPI.create({ text, summary_ratio: 0.3 });
       setResult(response.data);
     } catch (error) {
-      console.error('Error creating summary:', error);
-      alert(error.response?.data?.detail || 'Error creating summary. Please try again.');
+      const msg =
+        error?.response?.data?.detail ||
+        error?.response?.data?.error ||
+        'Unable to reach the backend. Please start the server and try again.';
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -28,6 +34,7 @@ const Summary = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="bg-slate-800 rounded-lg p-6">
+        {error && <ErrorAlert title="Summarizer failed" message={error} />}
         <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
           <FileEdit size={28} />
           Text Summarizer

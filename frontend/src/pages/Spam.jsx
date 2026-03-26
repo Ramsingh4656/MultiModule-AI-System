@@ -1,22 +1,28 @@
 import React, { useState } from 'react';
 import { spamAPI } from '../services/api';
 import { Shield, AlertTriangle, CheckCircle, Loader2 } from 'lucide-react';
+import ErrorAlert from '../components/ErrorAlert';
 
 const Spam = () => {
   const [emailText, setEmailText] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
 
   const handleCheck = async () => {
     if (!emailText.trim()) return;
 
     setLoading(true);
+    setError(null);
     try {
       const response = await spamAPI.check({ email_text: emailText });
       setResult(response.data);
     } catch (error) {
-      console.error('Error checking spam:', error);
-      alert('Error checking email. Please try again.');
+      const msg =
+        error?.response?.data?.detail ||
+        error?.response?.data?.error ||
+        'Unable to reach the backend. Please start the server and try again.';
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -38,6 +44,7 @@ const Spam = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="bg-slate-800 rounded-lg p-6">
+        {error && <ErrorAlert title="Spam detector failed" message={error} />}
         <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
           <Shield size={28} />
           Spam & Phishing Detector

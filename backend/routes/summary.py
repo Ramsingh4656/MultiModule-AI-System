@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from typing import Optional
+import json
 
 from database.database import get_db
 from models.models import Summary
@@ -42,7 +43,9 @@ async def create_summary(
             user_id=1,  # Demo user
             original_text=request.text[:2000],  # Store first 2000 chars
             summary_text=result['summary'],
-            compression_ratio=result['compression_ratio']
+            compression_ratio=result['compression_ratio'],
+            bullet_points=json.dumps(result.get("bullet_points", [])),
+            key_terms=json.dumps(result.get("key_terms", [])),
         )
         
         db.add(summary)

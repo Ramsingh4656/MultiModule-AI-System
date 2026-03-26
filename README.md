@@ -1,361 +1,382 @@
+# 🤖 MultiModule AI System
+
 <div align="center">
 
-# 🚀 MultiModule AI System
-### Multi-Module AI Automation Platform
+**A full-stack AI-powered productivity platform with 5 intelligent modules**
 
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
 [![React](https://img.shields.io/badge/React-18+-61DAFB.svg)](https://reactjs.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-009688.svg)](https://fastapi.tiangolo.com)
+[![Vite](https://img.shields.io/badge/Vite-5.0+-646CFF.svg)](https://vitejs.dev)
+[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.3+-38BDF8.svg)](https://tailwindcss.com)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-*A comprehensive AI-powered productivity platform featuring intelligent document analysis, spam detection, text summarization, and conversational AI.*
-
-[🎮 Quick Start](#-quick-start) • [✨ Features](#-features) • [🛠️ Installation](#️-installation) • [📖 Documentation](#-api-documentation)
+[🌐 Live Demo](#-live-demo) • [✨ Features](#-features) • [🛠️ Local Setup](#️-local-setup) • [🚀 Deployment](#-deployment) • [📖 API Docs](#-api-reference)
 
 </div>
 
 ---
 
-## 🎯 Overview
+## 🌐 Live Demo
 
-The **AI Productivity Suite** is a full-stack web application that demonstrates real-world AI/ML integration in a production-ready environment. Built for academic demonstration and professional showcasing, it features four distinct AI modules working seamlessly together.
+| Service | URL | Status |
+|---|---|---|
+| 🖥️ **Frontend** | [[https://multimodule-ai-system-backend.onrender.com](https://multi-module-ai-system.vercel.app/) | ✅ Live |
+| ⚙️ **Backend API** | [https://multimodule-ai-system-backend.onrender.com](https://multimodule-ai-system-backend.onrender.com) | ✅ Live |
+| 📄 **Swagger Docs** | [https://multimodule-ai-system-backend.onrender.com/api/docs](https://multimodule-ai-system-backend.onrender.com/api/docs) | ✅ Live |
+| ❤️ **Health Check** | [https://multimodule-ai-system-backend.onrender.com/health](https://multimodule-ai-system-backend.onrender.com/health) | ✅ Live |
 
-### 🌟 Key Highlights
-- **🤖 Real AI Models**: Uses actual transformer models (DistilGPT-2) and ML algorithms
-- **🎪 Demo Ready**: No authentication required - instant access to all features
-- **🏗️ Production Architecture**: Scalable, maintainable, and cloud-ready design
-- **📱 Modern UI**: Responsive React interface with TailwindCSS
-- **⚡ Fast Setup**: One-click launcher with `startup.bat`
-
----
-
-## 🚀 Quick Start
-
-### Option 1: One-Click Launch (Recommended)
-```bash
-# Simply double-click the startup.bat file
-startup.bat
-```
-
-### Option 2: Manual Launch
-```bash
-# Terminal 1 - Backend
-cd backend && venv\Scripts\activate && python main.py
-
-# Terminal 2 - Frontend  
-cd frontend && npm run dev
-```
-
-### 🌐 Access Points
-- **Frontend**: http://localhost:5173
-- **Backend API**: http://localhost:8000
-- **API Documentation**: http://localhost:8000/api/docs
+> 💡 **Demo credentials:** `demo@example.com` / `demo123`
 
 ---
 
 ## ✨ Features
 
-<table>
-<tr>
-<td width="50%">
-
 ### 📄 Resume Analyzer
-- **PDF Processing**: Extract text from resume files
-- **NLP Analysis**: Intelligent skill identification
-- **Match Scoring**: Compare against job requirements
-- **Contact Extraction**: Automatic contact information parsing
+- Upload PDF or TXT resumes
+- Automatic skill extraction using NLP
+- ATS (Applicant Tracking System) scoring
+- Match score against job requirements
+- Missing skills detection & feedback
 
-</td>
-<td width="50%">
+### 🛡️ Spam / Phishing Detector
+- ML-based email classification (TF-IDF + Logistic Regression)
+- Confidence score with probability output
+- Pattern-based phishing link detection
+- Real-time analysis with history tracking
 
-### 🛡️ Spam/Phishing Detector
-- **ML Classification**: TF-IDF + Logistic Regression
-- **Confidence Scoring**: Probability-based results
-- **Real-time Analysis**: Instant email/message classification
-- **Pattern Recognition**: Advanced threat detection
-
-</td>
-</tr>
-<tr>
-<td width="50%">
-
-### 📝 Text Summarizer
-- **Extractive Summarization**: Key sentence identification
-- **Bullet Points**: Structured summary output
-- **Length Control**: Customizable summary length
-- **Context Preservation**: Maintains document meaning
-
-</td>
-<td width="50%">
+### 📝 Notes Summarizer
+- Extractive text summarization
+- Bullet-point structured output
+- Customizable summary length
+- Preserves key context and meaning
 
 ### 🤖 AI Chatbot
-- **DistilGPT-2 Model**: Real transformer-based responses
-- **Context Awareness**: Maintains conversation history
-- **Intent Recognition**: Understands user queries
-- **Session Management**: Persistent chat sessions
+- DistilGPT-2 transformer model (or rule-based fallback)
+- Conversation history & session management
+- Intent recognition (identity, coding, AI topics, etc.)
+- Context-aware multi-turn conversations
 
-</td>
-</tr>
-</table>
-
-### � Analytics Dashboard
-- **Usage Statistics**: Track module utilization
-- **Performance Metrics**: Monitor system health
-- **Activity Timeline**: Historical usage patterns
-- **Visual Charts**: Interactive data visualization
+### 📊 Analytics Dashboard
+- Usage stats across all modules
+- Activity timeline & historical data
+- Module performance metrics
+- Interactive charts with Recharts
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ Tech Stack
 
-```mermaid
-graph TB
-    A[React Frontend] --> B[FastAPI Backend]
-    B --> C[SQLite Database]
-    B --> D[AI/ML Services]
-    D --> E[HuggingFace Models]
-    D --> F[scikit-learn]
-    D --> G[NLTK]
-    B --> H[File Storage]
-```
-
-### Technology Stack
-
-| Layer | Technology | Purpose |
-|-------|------------|---------|
-| **Frontend** | React 18 + Vite | Modern UI framework with fast development |
-| **Styling** | TailwindCSS | Utility-first CSS framework |
-| **Backend** | FastAPI | High-performance Python web framework |
-| **Database** | SQLite | Lightweight, serverless database |
-| **AI/ML** | HuggingFace Transformers | Pre-trained language models |
-| **ML Library** | scikit-learn | Machine learning algorithms |
-| **NLP** | NLTK | Natural language processing toolkit |
-
----
-
-## 🛠️ Installation
-
-### Prerequisites
-- **Python**: 3.8 or higher
-- **Node.js**: 16 or higher
-- **Git**: For cloning the repository
-- **Windows**: For `startup.bat` (optional)
-
-### Step-by-Step Setup
-
-#### 1️⃣ Clone Repository
-```bash
-git clone https://github.com/Ramsingh4656/MultiModule-AI-System.git
-```
-
-#### 2️⃣ Backend Setup
-```bash
-cd backend
-
-# Create virtual environment
-python -m venv venv
-
-# Activate virtual environment
-venv\Scripts\activate  # Windows
-# source venv/bin/activate  # Linux/Mac
-
-# Install dependencies
-pip install -r requirements.txt
-```
-
-#### 3️⃣ Frontend Setup
-```bash
-cd frontend
-
-# Install Node.js dependencies
-npm install
-```
-
-#### 4️⃣ Launch Application
-```bash
-# Use the automated launcher
-startup.bat
-
-# OR manually start both servers
-# Terminal 1: cd backend && venv\Scripts\activate && python main.py
-# Terminal 2: cd frontend && npm run dev
-```
-
----
-
-## 📖 API Documentation
-
-### Core Endpoints
-
-#### Resume Analysis
-```http
-POST /api/resume/analyze
-Content-Type: multipart/form-data
-
-# Upload PDF file with optional required skills
-```
-
-#### Spam Detection
-```http
-POST /api/spam/check
-Content-Type: application/json
-
-{
-  "text": "Email content to analyze",
-  "sender": "sender@example.com"
-}
-```
-
-#### Text Summarization
-```http
-POST /api/summary/create
-Content-Type: application/json
-
-{
-  "text": "Long text to summarize",
-  "max_sentences": 3
-}
-```
-
-#### AI Chatbot
-```http
-POST /api/chat/message
-Content-Type: application/json
-
-{
-  "message": "Hello, how are you?",
-  "session_id": "optional-session-id"
-}
-```
-
-### Interactive API Docs
-Visit http://localhost:8000/api/docs for complete interactive API documentation with request/response examples.
-
----
-
-## 🤖 AI Models & Algorithms
-
-### Language Model
-- **Model**: DistilGPT-2 (Distilled GPT-2)
-- **Provider**: HuggingFace Transformers
-- **Purpose**: Conversational AI responses
-- **Features**: Context awareness, intent recognition
-
-### Machine Learning
-- **Spam Detection**: Logistic Regression with TF-IDF vectorization
-- **Text Processing**: NLTK for tokenization and preprocessing
-- **Feature Engineering**: Custom NLP pipelines for skill extraction
-
-### Performance
-- **Model Loading**: ~10-15 seconds on first startup
-- **Response Time**: <2 seconds for most operations
-- **Memory Usage**: ~500MB for loaded models
+| Layer | Technology |
+|---|---|
+| **Frontend** | React 18, Vite 5, TailwindCSS, Recharts, Axios |
+| **Backend** | FastAPI, Uvicorn, SQLAlchemy, Pydantic v2 |
+| **Database** | SQLite (dev) / PostgreSQL (prod) |
+| **Auth** | JWT (python-jose + bcrypt) |
+| **AI/ML** | HuggingFace Transformers (DistilGPT-2), pure Python NLP |
+| **PDF** | PyPDF2 |
+| **Frontend Host** | Vercel |
+| **Backend Host** | Render |
 
 ---
 
 ## 📁 Project Structure
 
 ```
-AI-Productivity-Suite/
-├── 📁 backend/                 # FastAPI Backend
-│   ├── 📄 main.py             # Application entry point
-│   ├── 📄 config.py           # Configuration settings
-│   ├── 📁 routes/             # API route handlers
-│   │   ├── 📄 analytics.py    # Analytics endpoints
-│   │   ├── 📄 chatbot.py      # Chatbot endpoints
-│   │   ├── 📄 resume.py       # Resume analysis endpoints
-│   │   ├── 📄 spam.py         # Spam detection endpoints
-│   │   └── 📄 summary.py      # Summarization endpoints
-│   ├── 📁 services/           # Business logic layer
-│   │   ├── 📄 chatbot_service.py    # AI chatbot service
-│   │   ├── 📄 resume_service.py     # Resume analysis service
-│   │   ├── 📄 spam_service.py       # Spam detection service
-│   │   └── 📄 summary_service.py    # Text summarization service
-│   ├── 📁 models/             # Database models
-│   ├── 📁 database/           # Database configuration
-│   ├── 📁 utils/              # Utility functions
-│   └── 📄 requirements.txt    # Python dependencies
-├── 📁 frontend/               # React Frontend
-│   ├── 📁 src/
-│   │   ├── 📁 components/     # Reusable UI components
-│   │   ├── 📁 pages/          # Application pages
-│   │   ├── 📁 services/       # API communication
-│   │   └── 📄 App.jsx         # Main application component
-│   ├── 📄 package.json        # Node.js dependencies
-│   └── 📄 vite.config.js      # Vite configuration
-├── 📄 startup.bat             # One-click launcher
-└── 📄 README.md              # This documentation
+MultiModule-AI-System/
+├── 📁 backend/
+│   ├── 📄 main.py              # FastAPI app entry point
+│   ├── 📄 config.py            # Environment config
+│   ├── 📄 requirements.txt     # Python dependencies
+│   ├── 📁 routes/
+│   │   ├── 📄 resume.py        # Resume analysis endpoints
+│   │   ├── 📄 spam.py          # Spam detection endpoints
+│   │   ├── 📄 summary.py       # Summarization endpoints
+│   │   ├── 📄 chatbot.py       # Chatbot endpoints
+│   │   └── 📄 analytics.py     # Analytics endpoints
+│   ├── 📁 services/
+│   │   ├── 📄 resume_service.py
+│   │   ├── 📄 spam_service.py
+│   │   ├── 📄 summary_service.py
+│   │   ├── 📄 chatbot_service.py
+│   │   └── 📄 lazy_loader.py
+│   ├── 📁 models/
+│   │   └── 📄 models.py        # SQLAlchemy DB models
+│   ├── 📁 database/
+│   │   └── 📄 database.py      # DB init & session
+│   └── 📁 utils/
+│       ├── 📄 logger.py
+│       └── 📄 security.py
+│
+├── 📁 frontend/
+│   ├── 📄 index.html
+│   ├── 📄 vite.config.js
+│   ├── 📄 package.json
+│   └── 📁 src/
+│       ├── 📄 App.jsx           # Router & layout
+│       ├── 📄 main.jsx
+│       ├── 📁 pages/
+│       │   ├── 📄 Dashboard.jsx
+│       │   ├── 📄 Resume.jsx
+│       │   ├── 📄 Spam.jsx
+│       │   ├── 📄 Summary.jsx
+│       │   ├── 📄 Chatbot.jsx
+│       │   └── 📄 Analytics.jsx
+│       ├── 📁 components/
+│       │   ├── 📄 Layout.jsx
+│       │   └── 📄 ErrorAlert.jsx
+│       └── 📁 services/
+│           └── 📄 api.js        # Axios API client
+│
+├── 📄 .env.example
+├── 📄 .gitignore
+├── 📄 render.yaml              # Render deploy config
+└── 📄 README.md
 ```
 
 ---
 
-## 🎓 Academic & Professional Value
+## 🛠️ Local Setup
 
-### Learning Outcomes
-- **Full-Stack Development**: Complete web application architecture
-- **AI/ML Integration**: Real-world machine learning implementation
-- **API Design**: RESTful service architecture
-- **Modern Frontend**: React with modern tooling
-- **Database Design**: Relational data modeling
-- **DevOps Practices**: Containerization-ready setup
+### Prerequisites
 
-### Technical Demonstrations
-- **Microservices Architecture**: Modular, scalable design
-- **Real AI Models**: Not mock data - actual ML predictions
-- **Production Patterns**: Error handling, logging, validation
-- **Security Considerations**: Input sanitization, CORS configuration
-- **Performance Optimization**: Efficient model loading and caching
+- **Python** 3.8+
+- **Node.js** 16+
+- **Git**
 
 ---
 
-## 🚀 Deployment & Scaling
+### 1️⃣ Clone the Repository
 
-### ☁️ Vercel Deployment (Production Ready)
-
-This project is fully configured for Vercel deployment with both frontend and backend running on Vercel's serverless infrastructure.
-
-#### Quick Deploy to Vercel
-1. Push your code to GitHub
-2. Go to [vercel.com](https://vercel.com) and import your repository
-3. Configure:
-   - **Framework Preset**: Vite
-   - **Root Directory**: Leave empty
-4. Click Deploy
-
-**Live URLs after deployment:**
-- Frontend: `https://your-project.vercel.app`
-- API: `https://your-project.vercel.app/api`
-- API Docs: `https://your-project.vercel.app/api/docs`
-
-📖 **Detailed deployment guide**: See [DEPLOYMENT.md](DEPLOYMENT.md)
-
-### Local Development
-- SQLite database (included)
-- File-based storage
-- Single-machine deployment
-
-### Production Considerations
-- **Serverless**: Vercel Functions (FastAPI + Mangum)
-- **Database**: Vercel Postgres or external PostgreSQL
-- **Storage**: Vercel Blob Storage or AWS S3
-- **Caching**: Redis for model caching
-- **CDN**: Automatic via Vercel Edge Network
-- **HTTPS**: Automatic SSL certificates
+```bash
+git clone https://github.com/Ramsingh4656/MultiModule-AI-System.git
+cd MultiModule-AI-System
+```
 
 ---
 
-## 📊 Performance Metrics
+### 2️⃣ Backend Setup
 
-| Operation | Response Time | Resource Usage |
-|-----------|---------------|----------------|
-| Resume Analysis | 2-5 seconds | 200MB RAM |
-| Spam Detection | <1 second | 50MB RAM |
-| Text Summarization | 1-3 seconds | 100MB RAM |
-| Chatbot Response | 1-2 seconds | 300MB RAM |
-| Model Loading | 10-15 seconds | 500MB RAM |
+```bash
+cd backend
+
+# Create virtual environment
+python -m venv venv
+
+# Activate (Windows)
+venv\Scripts\activate
+
+# Activate (macOS/Linux)
+source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+Create a `.env` file inside `backend/`:
+
+```env
+SECRET_KEY=your-secret-key-change-this
+DEBUG=True
+DATABASE_URL=sqlite:///./ai_productivity.db
+```
+
+Start the backend:
+
+```bash
+python main.py
+```
+
+Backend runs at → **http://localhost:8000**
+Swagger docs at → **http://localhost:8000/api/docs**
 
 ---
 
-### 🌟 Star this repository if you found it helpful!
+### 3️⃣ Frontend Setup
 
-</div>
+Open a **new terminal**:
+
+```bash
+cd frontend
+
+# Install dependencies
+npm install
+```
+
+Create a `.env` file inside `frontend/`:
+
+```env
+VITE_API_URL=http://localhost:8000/api
+```
+
+Start the frontend:
+
+```bash
+npm run dev
+```
+
+Frontend runs at → **http://localhost:5173**
+
+---
+
+### 4️⃣ Quick Launch (Windows)
+
+Alternatively, just double-click:
+
+```
+startup.bat
+```
+
+This starts both backend and frontend automatically.
+
+---
+
+### ✅ Local URLs Summary
+
+| Service | URL |
+|---|---|
+| Frontend | http://localhost:5173 |
+| Backend API | http://localhost:8000 |
+| Swagger Docs | http://localhost:8000/api/docs |
+| ReDoc | http://localhost:8000/api/redoc |
+| Health Check | http://localhost:8000/health |
+
+---
+
+## 🚀 Deployment
+
+### Backend → Render (Free, 24/7)
+
+The backend is deployed on [Render](https://render.com) with GitHub auto-deploy.
+
+**Setup:**
+1. Push `backend/` contents to GitHub repo root
+2. Go to [render.com](https://render.com) → New Web Service
+3. Connect GitHub repo, select **Python** runtime
+4. Set:
+   - **Build Command:** `pip install -r requirements.txt`
+   - **Start Command:** `uvicorn main:app --host 0.0.0.0 --port $PORT`
+5. Add env vars: `SECRET_KEY`, `DEBUG=False`
+6. Deploy ✅
+
+**Keep it 24/7 (prevent sleep):**
+- Set up [UptimeRobot](https://uptimerobot.com) (free) to ping `/health` every 5 minutes
+
+---
+
+### Frontend → Vercel (Free, Always-On)
+
+1. Push `frontend/` to GitHub
+2. Go to [vercel.com](https://vercel.com) → New Project → Import repo
+3. Framework: **Vite** (auto-detected)
+4. Add Environment Variable:
+   ```
+   VITE_API_URL = https://multimodule-ai-system-backend.onrender.com/api
+   ```
+5. Deploy ✅
+
+Every `git push` to `main` triggers an automatic redeploy on both platforms.
+
+---
+
+## 📖 API Reference
+
+Interactive docs available at:
+- **Swagger UI:** [/api/docs](https://multimodule-ai-system-backend.onrender.com/api/docs)
+- **ReDoc:** [/api/redoc](https://multimodule-ai-system-backend.onrender.com/api/redoc)
+
+### Key Endpoints
+
+#### Resume
+```http
+POST /api/resume/analyze        # Upload & analyze resume (PDF/TXT)
+GET  /api/resume/history        # Get analysis history
+GET  /api/resume/analysis/{id}  # Get specific analysis
+```
+
+#### Spam Detection
+```http
+POST /api/spam/check            # Check email/text for spam
+GET  /api/spam/history          # Get check history
+GET  /api/spam/stats            # Get spam statistics
+```
+
+#### Summarization
+```http
+POST /api/summary/create        # Summarize text
+GET  /api/summary/history       # Get summary history
+GET  /api/summary/detail/{id}   # Get specific summary
+```
+
+#### Chatbot
+```http
+POST /api/chat/message          # Send message
+GET  /api/chat/sessions         # Get all sessions
+GET  /api/chat/history/{id}     # Get session history
+DELETE /api/chat/session/{id}   # Delete session
+GET  /api/chat/model-info       # Get model info
+```
+
+#### Analytics
+```http
+GET /api/analytics/dashboard        # Overall stats
+GET /api/analytics/usage-by-module  # Per-module usage
+GET /api/analytics/monthly-usage    # Monthly breakdown
+GET /api/analytics/activity-timeline # Activity over time
+```
+
+---
+
+## ⚙️ Environment Variables
+
+### Backend (`backend/.env`)
+
+| Variable | Default | Description |
+|---|---|---|
+| `SECRET_KEY` | *(required)* | JWT signing key |
+| `DEBUG` | `False` | Enable debug mode |
+| `DATABASE_URL` | `sqlite:///./ai_productivity.db` | Database connection string |
+
+### Frontend (`frontend/.env`)
+
+| Variable | Default | Description |
+|---|---|---|
+| `VITE_API_URL` | `http://localhost:8000/api` | Backend API base URL |
+
+---
+
+## 📊 Performance
+
+| Module | Response Time | Notes |
+|---|---|---|
+| Resume Analyzer | 2–5 sec | PDF parsing + NLP |
+| Spam Detector | < 1 sec | Pure Python, no ML deps |
+| Summarizer | 1–3 sec | Extractive NLP |
+| Chatbot | 1–2 sec | DistilGPT-2 or rule-based |
+| Analytics | < 500ms | DB aggregation queries |
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Commit your changes: `git commit -m "Add your feature"`
+4. Push to the branch: `git push origin feature/your-feature`
+5. Open a Pull Request
+
+---
+
+## 👨‍💻 Author
+
+**Ramsingh4656**
+- GitHub: [@Ramsingh4656](https://github.com/Ramsingh4656)
+- Project: [MultiModule-AI-System](https://github.com/Ramsingh4656/MultiModule-AI-System)
+
+---
+
+## ⭐ Show Your Support
+
+If you found this project helpful, please consider giving it a **star** on GitHub!
+
+[![Star this repo](https://img.shields.io/github/stars/Ramsingh4656/MultiModule-AI-System?style=social)](https://github.com/Ramsingh4656/MultiModule-AI-System)

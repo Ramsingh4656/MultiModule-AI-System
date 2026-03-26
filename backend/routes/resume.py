@@ -22,6 +22,7 @@ async def analyze_resume(
     db: Session = Depends(get_db)
 ):
     """Analyze uploaded resume"""
+    file_path = settings.UPLOAD_DIR / f"demo_{file.filename}"
     try:
         # Validate file type
         file_ext = Path(file.filename).suffix.lower()
@@ -32,7 +33,6 @@ async def analyze_resume(
             )
         
         # Save uploaded file
-        file_path = settings.UPLOAD_DIR / f"demo_{file.filename}"
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
@@ -51,7 +51,9 @@ async def analyze_resume(
             extracted_text=analysis_result['extracted_text'],
             skills_found=json.dumps(analysis_result['skills_found']),
             match_score=analysis_result['match_score'],
-            missing_skills=json.dumps(analysis_result['missing_skills'])
+            missing_skills=json.dumps(analysis_result['missing_skills']),
+            ats_score=analysis_result.get("ats_score"),
+            ats_feedback=json.dumps(analysis_result.get("ats_feedback", [])),
         )
         
         db.add(resume_analysis)
@@ -60,9 +62,6 @@ async def analyze_resume(
         
         # Log activity
         logger.info(f"Resume analyzed: {file.filename}")
-        
-        # Clean up file
-        file_path.unlink()
         
         logger.info(f"Resume analyzed: {file.filename}")
         
@@ -74,12 +73,21 @@ async def analyze_resume(
             "total_skills_found": analysis_result['total_skills_found'],
             "match_score": analysis_result['match_score'],
             "missing_skills": analysis_result['missing_skills'],
-            "contact_info": analysis_result['contact_info']
+            "contact_info": analysis_result['contact_info'],
+            "ats_score": analysis_result.get("ats_score"),
+            "ats_feedback": analysis_result.get("ats_feedback"),
         }
         
     except Exception as e:
         logger.error(f"Error analyzing resume: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        # Always attempt cleanup of the uploaded temp file.
+        try:
+            if file_path.exists():
+                file_path.unlink()
+        except Exception:
+            pass
 
 @router.get("/history")
 async def get_resume_history(db: Session = Depends(get_db)):

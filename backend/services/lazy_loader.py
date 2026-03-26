@@ -27,8 +27,8 @@ class LazyLoader:
     def get_spam_service(cls):
         """Lazy load spam detection service"""
         if cls._spam_service is None:
-            from services.spam_service import SpamDetectionService
-            cls._spam_service = SpamDetectionService()
+            from services.spam_service import SpamDetectorService
+            cls._spam_service = SpamDetectorService()
         return cls._spam_service
     
     @classmethod
@@ -36,8 +36,8 @@ class LazyLoader:
     def get_resume_service(cls):
         """Lazy load resume analysis service"""
         if cls._resume_service is None:
-            from services.resume_service import ResumeAnalyzer
-            cls._resume_service = ResumeAnalyzer()
+            from services.resume_service import ResumeAnalyzerService
+            cls._resume_service = ResumeAnalyzerService()
         return cls._resume_service
     
     @classmethod
@@ -45,8 +45,8 @@ class LazyLoader:
     def get_summary_service(cls):
         """Lazy load text summarization service"""
         if cls._summary_service is None:
-            from services.summary_service import TextSummarizer
-            cls._summary_service = TextSummarizer()
+            from services.summary_service import SummarizerService
+            cls._summary_service = SummarizerService()
         return cls._summary_service
 
 # Export singleton instance

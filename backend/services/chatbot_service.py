@@ -1,127 +1,191 @@
-import re
 import random
+import re
 from typing import Dict, List, Tuple
-from config import settings
-import nltk
 
-# torch and transformers exceed Vercel's Lambda size limit and are optional.
-# When unavailable the service falls back to rule-based responses.
+from config import settings
+
+
+# torch/transformers are optional. Rule-based mode must work when unavailable.
 try:
-    import torch
-    from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+    import torch  # type: ignore
+    from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline  # type: ignore
+
     _TORCH_AVAILABLE = True
 except ImportError:
     _TORCH_AVAILABLE = False
 
-try:
-    nltk.data.find('tokenizers/punkt')
-except LookupError:
-    nltk.download('punkt', quiet=True)
 
 class ChatbotService:
     """
-    Real AI Chatbot Service using HuggingFace Transformers
-    Provides context-aware, dynamic conversational AI similar to ChatGPT
+    Chatbot service.
+
+    Intent detection is priority-ordered (list of tuples; order matters) so more
+    specific topics match before generic "question" catch-all.
     """
-    
-    # Intent patterns for better response generation
-    INTENT_PATTERNS = {
-        'greeting': [r'\b(hi|hello|hey|greetings)\b', r'^(good morning|good afternoon|good evening)'],
-        'farewell': [r'\b(bye|goodbye|see you|farewell)\b'],
-        'gratitude': [r'\b(thank|thanks|appreciate)\b'],
-        'question': [r'\?$', r'\b(what|when|where|who|why|how|can|could|would|is|are)\b'],
-        'help': [r'\b(help|assist|support)\b'],
-        'capability': [r'\b(can you|are you able|what can you)\b'],
-        'identity': [r'\b(who are you|what are you|your name)\b'],
+
+    # ORDER MATTERS (most specific first)
+    INTENT_PATTERNS: List[Tuple[str, List[str]]] = [
+        ("identity", [r"\b(who are you|what are you|your name)\b"]),
+        ("capability", [r"\b(can you|are you able|what can you)\b"]),
+        (
+            "ai_topic",
+            [
+                r"\b(machine learning|deep learning|neural networks?)\b",
+                r"\b(nlp|natural language processing)\b",
+                r"\b(computer vision)\b",
+                r"\b(artificial intelligence|ai)\b",
+            ],
+        ),
+        (
+            "coding",
+            [
+                r"\b(python|javascript|typescript|react|node|sql|django|fastapi)\b",
+                r"\b(write code|show code|implement|debug|bug|error)\b",
+                r"\b(algorithm|data structure)\b",
+            ],
+        ),
+        ("resume", [r"\b(resume|cv|ats)\b"]),
+        ("spam", [r"\b(spam|phishing|phish|scam)\b"]),
+        ("summary", [r"\b(summarize|summary|bullet points|key points)\b"]),
+        ("platform", [r"\b(platform|what is this|how does this work|features)\b"]),
+        ("greeting", [r"\b(hi|hello|hey|greetings)\b", r"^(good morning|good afternoon|good evening)\b"]),
+        ("farewell", [r"\b(bye|goodbye|see you|farewell)\b"]),
+        ("gratitude", [r"\b(thank|thanks|appreciate)\b"]),
+        ("help", [r"\b(help|assist|support)\b"]),
+        ("question", [r"\?$", r"\b(what|when|where|who|why|how|can|could|would|is|are)\b"]),
+    ]
+
+    KNOWLEDGE_BASE: Dict[str, List[str]] = {
+        "identity": [
+            "I'm your AI Productivity Assistant.\n\nAsk me about:\n- Resume analysis (ATS heuristics)\n- Spam/phishing detection\n- Notes summarization\n- The built-in analytics/dashboard\n- General AI questions",
+            "I'm a helpful AI assistant inside your productivity suite.\nTell me what you're working on, and I'll route you to the right module.",
+        ],
+        "capability": [
+            "I can help you automate common productivity workflows, including:\n- Uploading a resume to extract skills + ATS heuristics\n- Checking text for likely spam/phishing signals\n- Summarizing long notes into key bullet points\n- Answering questions and guiding you on using the platform",
+            "Yes. Tell me your goal (resume, spam, summary, or AI/coding question) and I'll respond with a tailored, practical answer.",
+        ],
+        "ai_topic": [
+            "Machine Learning (ML) is a way to build systems that learn patterns from data instead of being explicitly programmed.\n\nCommon types:\n- Supervised learning (labeled data)\n- Unsupervised learning (find structure)\n- Reinforcement learning (reward-driven)\n\nIf you want, tell me what you're trying to predict or understand and I'll outline a practical approach.",
+            "Artificial Intelligence is the broad field of making computers perform tasks that normally require human intelligence.\n\nMachine Learning is one major subfield of AI.\n- NLP helps computers work with text\n- Computer Vision helps with images/video\n- Deep Learning is ML using neural networks\n\nWhat domain are you interested in (text, images, or recommendations)?",
+            "Natural Language Processing (NLP) focuses on understanding and generating human language.\n\nTypical tasks:\n- Classification (spam/intent)\n- Extraction (key entities/skills)\n- Summarization\n- Chat assistants\n\nWant an example pipeline for NLP?",
+        ],
+        "coding": [
+            "I can help with coding by suggesting algorithms, debugging strategies, and implementation patterns.\n\nTo be specific, paste:\n- The error message (stack trace)\n- The relevant code snippet\n- What you expected vs what happened",
+            "Sure - share your requirements and any constraints (language, runtime, libraries). I'll propose a clean approach and edge cases to test.",
+        ],
+        "resume": [
+            "Resume mode: I can analyze your resume for skill matches and ATS-friendly structure.\n\nWhat I check heuristically:\n- Contact info presence (email/phone)\n- Section coverage (skills/experience/education/projects)\n- Action verbs and overall completeness\n\nIf you upload your resume (PDF/TXT), I'll return:\n- matched skills + missing skills\n- an ATS score + feedback",
+            "Send your resume text (or upload PDF/TXT) and list any target skills you care about. I'll compute a match score and highlight what's missing for ATS compatibility.",
+        ],
+        "spam": [
+            "Spam/phishing mode: I'll look for suspicious keywords + patterns and combine that with an ML probability signal.\n\nTypical red flags:\n- urgent/act-now language\n- money/reward terms\n- account-verification wording\n- suspicious call-to-action links\n\nPaste the email text and I'll classify it with confidence + reasons.",
+            "If you paste the message content, I can estimate whether it's likely spam or phishing and explain the main signals I detected.",
+        ],
+        "summary": [
+            "Summary mode: I'll generate an extractive summary (key sentences) and a short bullet list.\n\nHow to get better results:\n- Include the full context\n- Keep sentences complete\n- Add any focus areas you want emphasized\n\nPaste your text and tell me your target length if you have one.",
+            "I can summarize your notes into:\n- a concise paragraph\n- 5 bullet points\n- key terms\n\nSend the text when you're ready.",
+        ],
+        "platform": [
+            "Welcome to the AI Productivity Suite.\n\nModules you can use right now:\n- Resume Analyzer: upload PDF/TXT; get skill matches + ATS feedback\n- Spam/Phishing Detector: paste email text; get risk + reasons\n- Notes Summarizer: paste notes; get extractive summary + bullets\n- AI Chatbot: ask questions or request module-specific guidance\n- Analytics Dashboard: track module usage\n\nTip: If you're unsure where to start, say what your goal is (resume, spam, summary, or a general AI/coding question).",
+            "Here's how the platform works:\n- The frontend sends requests to `/api/*`\n- The backend runs fast, rule-based services (no network model downloads required)\n- Results are stored for analytics\n\nTell me which module you want and what input you have.",
+        ],
+        "greeting": [
+            "Hello! How can I help you today?",
+            "Hi there - what are you working on? Resume, spam detection, summarization, or an AI/coding question?",
+        ],
+        "farewell": [
+            "Goodbye! Come back anytime if you need help.",
+            "See you later - hope your day goes smoothly.",
+        ],
+        "gratitude": [
+            "You're welcome! If you want, I can help you run one of the modules next.",
+            "Glad I could help. What's the next task?",
+        ],
+        "help": [
+            "I can help with:\n- Resume analysis (ATS heuristics)\n- Spam/phishing checks\n- Extractive notes summarization\n- General AI/coding questions\n\nTell me your goal in one sentence and I'll route you.",
+            "Need guidance? Share your goal (resume/spam/summary/platform) and I'll suggest the best next step.",
+        ],
+        "question": [
+            "That's a good question. Can you share a bit more context about your goal (resume/spam/summary or a specific topic)?",
+            "I can help - what exactly do you want to accomplish, and what constraints do you have (time, format, audience)?",
+        ],
     }
-    
-    def __init__(self):
-        """Initialize the chatbot with GPT-2 model"""
+
+    def __init__(self) -> None:
         self.model_name = settings.CHATBOT_MODEL
         self.max_length = settings.MAX_RESPONSE_LENGTH
         self.model = None
         self.tokenizer = None
         self.generator = None
+        self.device = "cpu"
 
         if not _TORCH_AVAILABLE:
-            print("torch/transformers not available; using rule-based fallback responses.")
-            self.device = "cpu"
+            # Rule-based fallback will be used.
             return
 
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        
-        print(f"Loading chatbot model: {self.model_name} on {self.device}...")
-        
         try:
-            # Load tokenizer and model
+            self.device = "cuda" if torch.cuda.is_available() else "cpu"  # type: ignore[name-defined]
             self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
             self.model = AutoModelForCausalLM.from_pretrained(self.model_name)
             self.model.to(self.device)
-            
-            # Set pad token
+
             if self.tokenizer.pad_token is None:
                 self.tokenizer.pad_token = self.tokenizer.eos_token
-            
-            # Create text generation pipeline
+
             self.generator = pipeline(
-                'text-generation',
+                "text-generation",
                 model=self.model,
                 tokenizer=self.tokenizer,
-                device=0 if self.device == "cuda" else -1
+                device=0 if self.device == "cuda" else -1,
             )
-            
-            print("Chatbot model loaded successfully!")
-            
-        except Exception as e:
-            print(f"Error loading model: {str(e)}")
+        except Exception:
+            # Model load failures shouldn't break the app.
             self.model = None
             self.tokenizer = None
             self.generator = None
-    
+
     def detect_intent(self, message: str) -> Tuple[str, float]:
-        """Detect user intent from message"""
-        message_lower = message.lower().strip()
-        
-        for intent, patterns in self.INTENT_PATTERNS.items():
+        message_lower = (message or "").lower().strip()
+        if not message_lower:
+            return "question", 0.5
+
+        for intent, patterns in self.INTENT_PATTERNS:
             for pattern in patterns:
-                if re.search(pattern, message_lower):
-                    return intent, 0.85
-        
-        return 'general', 0.6
-    
+                if re.search(pattern, message_lower, flags=re.IGNORECASE):
+                    # Slightly higher confidence for specific topics.
+                    confidence = 0.9 if intent in {"ai_topic", "coding", "resume", "spam", "summary", "platform"} else 0.85
+                    return intent, confidence
+
+        return "question", 0.6
+
     def build_context(self, conversation_history: List[Dict], max_context: int = 5) -> str:
-        """Build conversation context from history"""
         if not conversation_history:
             return ""
-        
-        # Get last N messages
         recent_messages = conversation_history[-max_context:]
-        
-        # Build context string
-        context_parts = []
+        context_parts: List[str] = []
         for msg in recent_messages:
-            role = msg.get('role', 'user')
-            content = msg.get('content', '')
-            if role == 'user':
+            role = msg.get("role", "user")
+            content = msg.get("content", "")
+            if role == "user":
                 context_parts.append(f"Human: {content}")
             else:
                 context_parts.append(f"Assistant: {content}")
-        
         return "\n".join(context_parts)
-    
+
+    def _fallback_response(self, message: str, intent: str) -> str:
+        options = self.KNOWLEDGE_BASE.get(intent) or self.KNOWLEDGE_BASE["question"]
+        return random.choice(options)
+
     def generate_response_with_model(self, prompt: str, context: str = "") -> str:
-        """Generate response using GPT-2 model"""
-        if self.generator is None:
-            return self._fallback_response(prompt)
-        
+        if self.generator is None or self.tokenizer is None:
+            return self._fallback_response(prompt, self.detect_intent(prompt)[0])
+
         try:
-            # Build full prompt with context
             if context:
                 full_prompt = f"{context}\nHuman: {prompt}\nAssistant:"
             else:
                 full_prompt = f"Human: {prompt}\nAssistant:"
-            
-            # Generate response
+
             outputs = self.generator(
                 full_prompt,
                 max_length=len(full_prompt.split()) + self.max_length,
@@ -132,155 +196,56 @@ class ChatbotService:
                 do_sample=True,
                 pad_token_id=self.tokenizer.eos_token_id,
                 no_repeat_ngram_size=3,
-                repetition_penalty=1.2
+                repetition_penalty=1.2,
             )
-            
-            # Extract generated text
-            generated_text = outputs[0]['generated_text']
-            
-            # Extract only the assistant's response
+
+            generated_text = outputs[0].get("generated_text", "")
             if "Assistant:" in generated_text:
                 response = generated_text.split("Assistant:")[-1].strip()
-                # Clean up response
                 response = response.split("Human:")[0].strip()
+                # Keep first paragraph-ish segment
                 response = response.split("\n")[0].strip()
-                
-                # Remove incomplete sentences
-                if response and not response[-1] in '.!?':
-                    sentences = response.split('.')
-                    if len(sentences) > 1:
-                        response = '.'.join(sentences[:-1]) + '.'
-                
-                return response if response else self._fallback_response(prompt)
-            
-            return self._fallback_response(prompt)
-            
-        except Exception as e:
-            print(f"Error generating response: {str(e)}")
-            return self._fallback_response(prompt)
-    
-    def _fallback_response(self, prompt: str) -> str:
-        """Generate fallback response when model fails"""
-        intent, _ = self.detect_intent(prompt)
-        
-        fallback_responses = {
-            'greeting': [
-                "Hello! How can I assist you today?",
-                "Hi there! What can I help you with?",
-                "Hey! I'm here to help. What do you need?"
-            ],
-            'farewell': [
-                "Goodbye! Feel free to return if you need anything.",
-                "See you later! Have a great day!",
-                "Take care! I'm here whenever you need assistance."
-            ],
-            'gratitude': [
-                "You're welcome! Happy to help!",
-                "My pleasure! Let me know if you need anything else.",
-                "Glad I could help!"
-            ],
-            'help': [
-                "I'm here to assist you with various tasks. You can ask me questions, request information, or just have a conversation!",
-                "I can help you with many things! Just ask me a question or tell me what you need.",
-            ],
-            'capability': [
-                "I'm an AI assistant that can help answer questions, provide information, and have conversations with you. What would you like to know?",
-                "I can assist with answering questions, providing explanations, and discussing various topics. How can I help you today?"
-            ],
-            'identity': [
-                "I'm an AI assistant designed to help you with information and tasks. Think of me as your helpful digital companion!",
-                "I'm an AI chatbot built to assist users like you. I'm here to answer questions and provide helpful information."
-            ],
-            'general': [
-                "That's an interesting point. Could you tell me more about what you're looking for?",
-                "I understand. How can I help you with that?",
-                "Interesting! What specific information do you need?",
-                "I'm here to help. Could you provide more details about what you need?"
-            ]
-        }
-        
-        responses = fallback_responses.get(intent, fallback_responses['general'])
-        return random.choice(responses)
-    
-    def enhance_response(self, response: str, intent: str) -> str:
-        """Enhance response based on intent"""
-        # Add personality and natural language
-        if intent == 'question' and '?' not in response:
-            if not response.endswith(('.', '!', '?')):
-                response += '.'
-        
-        # Ensure proper capitalization
-        if response and response[0].islower():
-            response = response[0].upper() + response[1:]
-        
-        return response
-    
-    def calculate_confidence(self, response: str, intent: str) -> float:
-        """Calculate confidence score for response"""
-        base_confidence = 0.75
-        
-        # Adjust based on response quality
-        if len(response) > 20:
-            base_confidence += 0.1
-        
-        if intent in ['greeting', 'farewell', 'gratitude']:
-            base_confidence += 0.15
-        
-        # Check for complete sentences
-        if response.endswith(('.', '!', '?')):
-            base_confidence += 0.05
-        
-        return min(round(base_confidence, 2), 0.99)
-    
-    def chat(self, message: str, conversation_history: List[Dict] = None) -> Dict:
-        """
-        Main chat method - generates context-aware responses
-        
-        Args:
-            message: User's input message
-            conversation_history: List of previous messages for context
-        
-        Returns:
-            Dict with response, intent, confidence, and metadata
-        """
-        # Detect intent
-        intent, intent_confidence = self.detect_intent(message)
-        
-        # Build context from history
+                return response if response else self._fallback_response(prompt, self.detect_intent(prompt)[0])
+
+            return self._fallback_response(prompt, self.detect_intent(prompt)[0])
+        except Exception:
+            return self._fallback_response(prompt, self.detect_intent(prompt)[0])
+
+    def chat(self, message: str, conversation_history: List[Dict] | None = None) -> Dict:
+        intent, _intent_confidence = self.detect_intent(message)
+
         context = ""
         if conversation_history:
-            context = self.build_context(
-                conversation_history,
-                max_context=settings.MAX_CONTEXT_LENGTH
-            )
-        
-        # Generate response
-        if self.model is not None:
+            context = self.build_context(conversation_history, max_context=settings.MAX_CONTEXT_LENGTH)
+
+        if self.model is not None and self.generator is not None:
             response = self.generate_response_with_model(message, context)
+            model_used = self.model_name
         else:
-            response = self._fallback_response(message)
-        
-        # Enhance response
-        response = self.enhance_response(response, intent)
-        
-        # Calculate confidence
-        confidence = self.calculate_confidence(response, intent)
-        
+            response = self._fallback_response(message, intent)
+            model_used = "fallback"
+
+        # Confidence: base + a little bump if response is multi-line/detailed.
+        confidence = 0.82 if intent != "question" else 0.72
+        if len(response) > 120:
+            confidence = min(0.99, confidence + 0.08)
+        if "\n" in response:
+            confidence = min(0.99, confidence + 0.05)
+
         return {
-            'response': response,
-            'intent': intent,
-            'confidence': confidence,
-            'has_context': len(conversation_history) > 0 if conversation_history else False,
-            'model_used': self.model_name if self.model else 'fallback',
-            'context_length': len(conversation_history) if conversation_history else 0
+            "response": response,
+            "intent": intent,
+            "confidence": round(confidence, 2),
+            "has_context": bool(conversation_history),
+            "model_used": model_used,
+            "context_length": len(conversation_history) if conversation_history else 0,
         }
-    
+
     def get_model_info(self) -> Dict:
-        """Get information about the loaded model"""
         return {
-            'model_name': self.model_name,
-            'device': self.device,
-            'is_loaded': self.model is not None,
-            'max_response_length': self.max_length,
-            'max_context_length': settings.MAX_CONTEXT_LENGTH
+            "model_name": self.model_name,
+            "device": self.device,
+            "is_loaded": self.model is not None,
+            "max_response_length": self.max_length,
+            "max_context_length": settings.MAX_CONTEXT_LENGTH,
         }

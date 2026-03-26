@@ -16,12 +16,13 @@ class Settings:
     ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
     
     # Database - Use /tmp for serverless environments
-    DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:////tmp/ai_productivity.db")
+    DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./ai_productivity.db")
     
-    # File Upload - Use /tmp for serverless
-    UPLOAD_DIR = Path("/tmp/uploads")
+    # File Upload - keep uploads inside the backend folder
+    UPLOAD_DIR = Path(__file__).resolve().parent / "uploads"
     MAX_UPLOAD_SIZE = 10 * 1024 * 1024  # 10MB
-    ALLOWED_EXTENSIONS = {".pdf", ".txt", ".docx"}
+    # ResumeAnalyzer supports PDF/TXT only
+    ALLOWED_EXTENSIONS = {".pdf", ".txt"}
     
     # CORS - Allow all origins for Vercel
     CORS_ORIGINS = ["*"]
@@ -33,7 +34,7 @@ class Settings:
     
     # Logging
     LOG_LEVEL = "INFO"
-    LOG_FILE = "/tmp/app.log"
+    LOG_FILE = str((Path(__file__).resolve().parent / "app.log"))
 
 settings = Settings()
 

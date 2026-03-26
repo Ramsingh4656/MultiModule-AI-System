@@ -31,7 +31,10 @@ async def check_spam(
             email_text=email_data.email_text[:1000],  # Store first 1000 chars
             is_spam=result['is_spam'],
             confidence=result['confidence'],
-            features=json.dumps(result['features'])
+            classification=result.get("classification", "LEGITIMATE"),
+            risk_level=result.get("risk_level", "LOW"),
+            reasons=json.dumps(result.get("reasons", [])),
+            features=json.dumps(result.get('features', {})),
         )
         
         db.add(spam_check)

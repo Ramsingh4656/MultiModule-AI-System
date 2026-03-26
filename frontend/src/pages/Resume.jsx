@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { resumeAPI } from '../services/api';
 import { Upload, FileText, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import ErrorAlert from '../components/ErrorAlert';
 
 const Resume = () => {
   const [file, setFile] = useState(null);
   const [requiredSkills, setRequiredSkills] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -17,6 +19,7 @@ const Resume = () => {
     if (!file) return;
 
     setLoading(true);
+    setError(null);
     const formData = new FormData();
     formData.append('file', file);
     if (requiredSkills) {
@@ -27,8 +30,11 @@ const Resume = () => {
       const response = await resumeAPI.analyze(formData);
       setResult(response.data);
     } catch (error) {
-      console.error('Error analyzing resume:', error);
-      alert('Error analyzing resume. Please try again.');
+      const msg =
+        error?.response?.data?.detail ||
+        error?.response?.data?.error ||
+        'Unable to reach the backend. Please start the server and try again.';
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -37,6 +43,7 @@ const Resume = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="bg-slate-800 rounded-lg p-6">
+        {error && <ErrorAlert title="Resume analyzer failed" message={error} />}
         <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
           <FileText size={28} />
           Resume Analyzer

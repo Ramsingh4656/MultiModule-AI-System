@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { analyticsAPI } from '../services/api';
 import { FileText, Shield, FileEdit, MessageSquare, TrendingUp, Activity } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import ErrorAlert from '../components/ErrorAlert';
 
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
   const [usageData, setUsageData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     loadDashboardData();
@@ -22,7 +24,11 @@ const Dashboard = () => {
       setStats(dashboardRes.data.stats);
       setUsageData(usageRes.data.usage_by_module);
     } catch (error) {
-      console.error('Error loading dashboard:', error);
+      const msg =
+        error?.response?.data?.detail ||
+        error?.response?.data?.error ||
+        'Unable to reach the backend. Please start the server and try again.';
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -69,6 +75,7 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6">
+      {error && <ErrorAlert title="Backend unavailable" message={error} />}
       {/* Welcome section */}
       <div className="bg-gradient-to-r from-primary-600 to-purple-600 rounded-lg p-6 text-white">
         <h1 className="text-3xl font-bold mb-2">Welcome to AI Productivity Suite</h1>

@@ -58,3 +58,5 @@ htmlcov/
 # AI Models Cache
 models/
 .cache/huggingface/
+
+.vercel

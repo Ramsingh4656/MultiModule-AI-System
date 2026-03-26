@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { analyticsAPI } from '../services/api';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { TrendingUp, Activity, Calendar } from 'lucide-react';
+import ErrorAlert from '../components/ErrorAlert';
 
 const Analytics = () => {
   const [usageData, setUsageData] = useState([]);
   const [monthlyData, setMonthlyData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     loadAnalytics();
@@ -22,7 +24,11 @@ const Analytics = () => {
       setUsageData(usageRes.data.usage_by_module);
       setMonthlyData(monthlyRes.data.monthly_usage);
     } catch (error) {
-      console.error('Error loading analytics:', error);
+      const msg =
+        error?.response?.data?.detail ||
+        error?.response?.data?.error ||
+        'Unable to reach the backend. Please start the server and try again.';
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -40,6 +46,7 @@ const Analytics = () => {
 
   return (
     <div className="space-y-6">
+      {error && <ErrorAlert title="Analytics unavailable" message={error} />}
       <div className="bg-slate-800 rounded-lg p-6">
         <h2 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
           <TrendingUp size={28} />
