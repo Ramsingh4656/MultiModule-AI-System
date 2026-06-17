@@ -21,7 +21,7 @@
 
 | Service | URL | Status |
 |---|---|---|
-| 🖥️ **Frontend** | [https://multimodule-ai-system-backend.onrender.com](https://multi-module-ai-system.vercel.app/) | ✅ Live |
+| 🖥️ **Frontend** | [https://multimodule-ai-system-backend.vercel.com](https://multi-module-ai-system.vercel.app/) | ✅ Live |
 | ⚙️ **Backend API** | [https://multimodule-ai-system-backend.onrender.com](https://multimodule-ai-system-backend.onrender.com) | ✅ Live |
 | 📄 **Swagger Docs** | [https://multimodule-ai-system-backend.onrender.com/api/docs](https://multimodule-ai-system-backend.onrender.com/api/docs) | ✅ Live |
 | ❤️ **Health Check** | [https://multimodule-ai-system-backend.onrender.com/health](https://multimodule-ai-system-backend.onrender.com/health) | ✅ Live |
